@@ -8,6 +8,8 @@ const app = express()
 const PORT = 3001
 app.set('view engine', 'ejs')
 app.use(layout)
+// tell express to listen for request bodies sent from HTML forms
+app.use(express.urlencoded({ extended: false }))
 
 // get the dinos from the db
 const readDinoFile = () => {
@@ -20,7 +22,7 @@ const readDinoFile = () => {
 
 // route definitions
 app.get('/', (req, res) => {
-    res.send('welcome to the dino CRUD app 🦖')
+    res.render('home.ejs')
 })
 
 // GET /dinosaurs -- show all dinos
@@ -28,12 +30,15 @@ app.get('/dinosaurs', (req, res) => {
     const dinoData = readDinoFile()
     // send the dino info to the client
     // TODO: add ejs view
-    res.json(dinoData)
+    res.render('dinos/index.ejs', {
+        dinos: dinoData,
+        // myDataName: 'hello template, how are you?'
+    })
 })
 
 // GET /dinosaurs/new -- display a form to create a new dino
 app.get('/dinosaurs/new', (req, res) => {
-    res.send('show a form to create a new dino')
+    res.render('dinos/new.ejs')
 })
 
 // POST /dinosaurs -- create a new dino in the DB
@@ -43,9 +48,13 @@ app.post('/dinosaurs', (req, res) => {
     // payload of data from the request body (req.body)
     // push the data payload into the array of dinos
     console.log(req.body)
+    dinoData.push(req.body)
     // save the dino file
+    fs.writeFileSync('./dinosaurs.json', JSON.stringify(dinoData))
     // on POST routes -- DO NOT RENDER A TEMPLATE (this can broken)
     // redirect to where you can find a template
+    // redirects tell browsers to make a GET request on a url
+    res.redirect('/dinosaurs')
 })
 
 // GET /dinosaurs/:id -- display the details of one specific dino
