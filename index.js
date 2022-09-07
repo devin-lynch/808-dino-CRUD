@@ -64,8 +64,9 @@ app.get('/dinosaurs/:id', (req, res) => {
     // look up array index from the url route params
     const dino = dinoData[req.params.id]
     // send back a single dino
-    res.json(dino)
+    res.render('dinos/show.ejs', {myDino: dino})
 })
+
 
 // listen on a port
 app.listen(PORT, () => console.log(`is that dinos i hear on port ${PORT} 🦕`))
